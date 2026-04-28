@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 @Database(
     entities = [FavorisEntity::class],
-    version = 1,
+    version = 2,             // ← 1 → 2 car le schéma change
     exportSchema = false
 )
 

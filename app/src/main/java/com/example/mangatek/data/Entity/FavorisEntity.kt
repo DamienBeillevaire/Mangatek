@@ -5,7 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "favoris")
 data class FavorisEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val date: String,
+    @PrimaryKey
+    val malId: Int,          // ID unique de l'anime (remplace autoGenerate)
+    val title: String,
+    val imageUrl: String,
+    val score: Double?,
+    val addedAt: String      // date d'ajout
 )

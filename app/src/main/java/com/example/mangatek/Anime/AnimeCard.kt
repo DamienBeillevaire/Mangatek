@@ -14,13 +14,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
 @Composable
-fun AnimeCard(anime: AnimeData) {
+fun AnimeCard(
+    anime: AnimeData,
+    isFavorite: Boolean,                    // ← reçu depuis l'extérieur
+    onFavoriteToggle: (AnimeData) -> Unit,   // ← callback vers le ViewModel
+    onClick: () -> Unit
+) {
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp),
         shape = MaterialTheme.shapes.medium
@@ -28,7 +35,7 @@ fun AnimeCard(anime: AnimeData) {
         Column {
             AsyncImage(
                 model = anime.images.jpg.large_image_url ?: anime.images.jpg.image_url,
-                contentDescription = anime.title,
+                contentDescription = anime.title_english,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp),
@@ -36,13 +43,17 @@ fun AnimeCard(anime: AnimeData) {
             )
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(
-                    text = anime.title,
+                    text = anime.title_english,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
-                Row(modifier = Modifier.padding(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     anime.score?.let {
                         Text(
                             text = "⭐ $it",
@@ -50,16 +61,16 @@ fun AnimeCard(anime: AnimeData) {
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    var isFavorite by remember { mutableStateOf(false) }
-
                     IconToggleButton(
                         checked = isFavorite,
-                        onCheckedChange = { isFavorite = it }
+                        onCheckedChange = { onFavoriteToggle(anime) }
                     ) {
                         Icon(
-                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            imageVector = if (isFavorite) Icons.Filled.Favorite
+                            else Icons.Outlined.FavoriteBorder,
                             contentDescription = "Favoris",
-                            tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurface
+                            tint = if (isFavorite) Color.Red
+                            else MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }

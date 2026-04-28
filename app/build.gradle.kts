@@ -66,6 +66,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.ui)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

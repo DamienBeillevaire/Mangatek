@@ -1,5 +1,7 @@
 package com.example.mangatek
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,25 +20,45 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mangatek.data.ViewModel.FavorisViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AnimeScreen(viewModel: HomeViewModel = viewModel()) {
+fun AnimeScreen(
+    viewModel: HomeViewModel = viewModel(),
+    favorisViewModel: FavorisViewModel
+) {
+    val animes        by viewModel.animes.collectAsState()
+    val searchQuery   by viewModel.searchQuery.collectAsState()
+    val searchResults by viewModel.searchResults.collectAsState()
+    val isSearching   by viewModel.isSearching.collectAsState()
+    val isLoading     by viewModel.isLoading.collectAsState()
+    val hasNextPage   by viewModel.hasNextPage.collectAsState()
+    val favorisIds    by favorisViewModel.favorisIds.collectAsState()
 
-    val animes         by viewModel.animes.collectAsState()
-    val searchQuery    by viewModel.searchQuery.collectAsState()
-    val searchResults  by viewModel.searchResults.collectAsState()
-    val isSearching    by viewModel.isSearching.collectAsState()
-    val isLoading      by viewModel.isLoading.collectAsState()
-    val hasNextPage    by viewModel.hasNextPage.collectAsState()
-
-    // Bascule automatiquement entre top animes et résultats de recherche
     val displayList = if (searchQuery.isNotEmpty()) searchResults else animes
 
+    // Anime sélectionné pour le détail
+    var selectedAnime by remember { mutableStateOf<AnimeData?>(null) }
+
+    // Si un anime est sélectionné → afficher l'écran de détail
+    selectedAnime?.let { anime ->
+        AnimeDetailScreen(
+            anime = anime,
+            favorisViewModel = favorisViewModel,
+            onBack = { selectedAnime = null }
+        )
+        return
+    }
+
+    // Sinon → afficher la grille
     Column(modifier = Modifier.fillMaxSize()) {
 
         AnimeSearchBar(
@@ -72,7 +94,7 @@ fun AnimeScreen(viewModel: HomeViewModel = viewModel()) {
                     }
                 }
 
-                // Grille d'animes (top ou résultats de recherche)
+                // Grille d'animes
                 else -> {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
@@ -82,7 +104,12 @@ fun AnimeScreen(viewModel: HomeViewModel = viewModel()) {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(displayList, key = { it.mal_id }) { anime ->
-                            AnimeCard(anime = anime)
+                            AnimeCard(
+                                anime = anime,
+                                isFavorite = anime.mal_id in favorisIds,
+                                onFavoriteToggle = { favorisViewModel.toggleFavoris(it) },
+                                onClick = { selectedAnime = anime }
+                            )
                         }
 
                         // Pagination uniquement hors recherche

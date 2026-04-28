@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import com.example.mangatek.AnimeData
+import kotlinx.coroutines.flow.map
 
 class FavorisViewModel(
     private val repository: FavorisRepository
@@ -25,24 +27,41 @@ class FavorisViewModel(
             initialValue = emptyList()
         )
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun ajouterFavoris(
-        date: String
-    ) {
+    // Set des IDs favoris pour vérifier rapidement si un anime est favori
+    val favorisIds: StateFlow<Set<Int>> = favoris
+        .map { list -> list.map { it.malId }.toSet() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptySet()
+        )
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun toggleFavoris(anime: AnimeData) {
         viewModelScope.launch {
-            repository.insert(
-                FavorisEntity(
-                    date = LocalDate.now().toString()
-                )
-            )
+            val isFav = favoris.value.any { it.malId == anime.mal_id }
+            if (isFav) {
+                repository.delete(FavorisEntity(
+                    malId = anime.mal_id,
+                    title = anime.title_english,
+                    imageUrl = anime.images.jpg.large_image_url ?: anime.images.jpg.image_url,
+                    score = anime.score,
+                    addedAt = ""
+                ))
+            } else {
+                repository.insert(FavorisEntity(
+                    malId = anime.mal_id,
+                    title = anime.title_english,
+                    imageUrl = anime.images.jpg.large_image_url ?: anime.images.jpg.image_url,
+                    score = anime.score,
+                    addedAt = LocalDate.now().toString()
+                ))
+            }
         }
     }
 
     fun supprimerFavoris(favoris: FavorisEntity) {
-        viewModelScope.launch {
-            repository.delete(favoris)
-        }
+        viewModelScope.launch { repository.delete(favoris) }
     }
 }
 
@@ -54,7 +73,6 @@ class FavorisViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return FavorisViewModel(repository) as T
         }
-
         throw IllegalArgumentException("ViewModel inconnue")
     }
 }

@@ -1,6 +1,5 @@
 package com.example.mangatek
 
-// AnimeModel.kt
 data class AnimeListResponse(
     val data: List<AnimeData>,
     val pagination: Pagination
@@ -15,13 +14,15 @@ data class Pagination(
 data class AnimeData(
     val mal_id: Int,
     val title: String,
+    val title_english: String,
     val synopsis: String?,
     val score: Double?,
     val episodes: Int?,
     val status: String?,
     val year: Int?,
     val genres: List<Genre>?,
-    val images: AnimeImages
+    val images: AnimeImages,
+    val trailer: Trailer?
 )
 
 data class Genre(
@@ -35,4 +36,8 @@ data class AnimeImages(
 data class ImageUrls(
     val image_url: String,
     val large_image_url: String?
+)
+
+data class Trailer(
+    val youtube_id: String?
 )
