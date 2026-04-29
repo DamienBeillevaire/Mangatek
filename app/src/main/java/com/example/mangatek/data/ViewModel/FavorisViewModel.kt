@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import com.example.mangatek.AnimeData
+import com.example.mangatek.displayTitle
 import kotlinx.coroutines.flow.map
 
 class FavorisViewModel(
@@ -43,7 +44,7 @@ class FavorisViewModel(
             if (isFav) {
                 repository.delete(FavorisEntity(
                     malId = anime.mal_id,
-                    title = anime.title_english,
+                    title = anime.displayTitle,
                     imageUrl = anime.images.jpg.large_image_url ?: anime.images.jpg.image_url,
                     score = anime.score,
                     addedAt = ""
@@ -51,7 +52,7 @@ class FavorisViewModel(
             } else {
                 repository.insert(FavorisEntity(
                     malId = anime.mal_id,
-                    title = anime.title_english,
+                    title = anime.displayTitle,
                     imageUrl = anime.images.jpg.large_image_url ?: anime.images.jpg.image_url,
                     score = anime.score,
                     addedAt = LocalDate.now().toString()

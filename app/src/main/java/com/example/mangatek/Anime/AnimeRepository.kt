@@ -27,5 +27,13 @@ class AnimeRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun getAnimeDetail(id: Int): Result<AnimeData> {
+        return try {
+            Result.success(api.getAnimeDetail(id).data)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
 

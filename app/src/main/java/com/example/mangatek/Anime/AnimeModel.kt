@@ -14,7 +14,7 @@ data class Pagination(
 data class AnimeData(
     val mal_id: Int,
     val title: String,
-    val title_english: String,
+    val title_english: String?,
     val synopsis: String?,
     val score: Double?,
     val episodes: Int?,
@@ -22,7 +22,6 @@ data class AnimeData(
     val year: Int?,
     val genres: List<Genre>?,
     val images: AnimeImages,
-    val trailer: Trailer?
 )
 
 data class Genre(
@@ -38,6 +37,10 @@ data class ImageUrls(
     val large_image_url: String?
 )
 
-data class Trailer(
-    val youtube_id: String?
+
+val AnimeData.displayTitle: String
+    get() = title_english?.takeIf { it.isNotBlank() } ?: title
+
+data class AnimeDetailResponse(
+    val data: AnimeData
 )

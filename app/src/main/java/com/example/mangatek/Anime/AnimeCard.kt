@@ -35,7 +35,7 @@ fun AnimeCard(
         Column {
             AsyncImage(
                 model = anime.images.jpg.large_image_url ?: anime.images.jpg.image_url,
-                contentDescription = anime.title_english,
+                contentDescription = anime.displayTitle,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp),
@@ -43,7 +43,7 @@ fun AnimeCard(
             )
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(
-                    text = anime.title_english,
+                    text = anime.displayTitle,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,

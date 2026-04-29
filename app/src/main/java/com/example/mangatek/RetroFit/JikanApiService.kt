@@ -26,4 +26,9 @@ interface JikanApiService {
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 20
     ): AnimeListResponse
+
+    @GET("anime/{id}")
+    suspend fun getAnimeDetail(
+        @Path("id") id: Int
+    ): AnimeDetailResponse
 }
