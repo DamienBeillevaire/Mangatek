@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1079364283935",
+    "project_id": "mangatek-c20f8",
+    "storage_bucket": "mangatek-c20f8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079364283935:android:49ffa3383830cff67baf2a",
+        "android_client_info": {
+          "package_name": "com.example.mangatek"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrAqMjzCCWAZl-K_UNL4zv3EZq7jxxhFo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

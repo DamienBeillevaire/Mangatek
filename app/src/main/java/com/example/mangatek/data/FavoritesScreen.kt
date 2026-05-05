@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.mangatek.data.FavorisEntity
+import com.example.mangatek.data.entity.FavorisEntity
 import com.example.mangatek.data.ViewModel.FavorisViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)

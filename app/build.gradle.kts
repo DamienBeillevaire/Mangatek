@@ -1,7 +1,10 @@
+import org.gradle.kotlin.dsl.implementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -51,6 +54,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+    implementation ("androidx.compose.material:material-icons-extended")
 
     // Retrofit + Gson
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
@@ -67,6 +71,12 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.ui)
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-analytics")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
