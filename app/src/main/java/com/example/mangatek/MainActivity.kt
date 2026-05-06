@@ -231,7 +231,8 @@ fun MangatekApp(
 
                 // Onglet 2 : Liste des animes favoris de l'utilisateur
                 AppDestinations.FAVORITES -> FavoritesScreen(
-                    favorisViewModel = favorisViewModel
+                    favorisViewModel = favorisViewModel,
+                    homeViewModel = homeViewModel
                 )
 
                 // Onglet 3 : Profil utilisateur + déconnexion

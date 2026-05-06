@@ -2,6 +2,7 @@ package com.example.mangatek
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.icons.Icons
@@ -37,31 +38,35 @@ import com.example.mangatek.data.ViewModel.FavorisViewModel
 //   depuis n'importe quel autre écran (AnimeScreen, AnimeDetailScreen).
 // =============================================================================
 
-@RequiresApi(Build.VERSION_CODES.O)   // Requis par AnimeDetailScreen
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FavoritesScreen(favorisViewModel: FavorisViewModel) {
+fun FavoritesScreen(favorisViewModel: FavorisViewModel, homeViewModel: HomeViewModel) {
 
-    // Liste des favoris observée en temps réel depuis Room via FavorisViewModel
     val favoris by favorisViewModel.favoris.collectAsState()
+    val favoriteDetail by homeViewModel.favoriteDetailAnime.collectAsState()
+    val isDetailLoading by homeViewModel.isFavoriteDetailLoading.collectAsState()
 
-    // État local de navigation (identique au pattern utilisé dans AnimeScreen)
-    var selectedAnime by remember { mutableStateOf<AnimeData?>(null) }
-
-    // ---- NAVIGATION VERS LE DÉTAIL (return early) ----
-    // Si un anime est sélectionné → affiche AnimeDetailScreen et sort de la fonction
-    selectedAnime?.let { anime ->
+    // ---- NAVIGATION VERS LE DÉTAIL ----
+    favoriteDetail?.let { anime ->
         AnimeDetailScreen(
             anime = anime,
             favorisViewModel = favorisViewModel,
-            onBack = { selectedAnime = null }  // Retour à la liste des favoris
+            onBack = { homeViewModel.clearFavoriteDetail() }
         )
         return
     }
 
+    // ---- CHARGEMENT DU DÉTAIL EN COURS ----
+    if (isDetailLoading) {
+        Box(modifier = Modifier.fillMaxSize().statusBarsPadding(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
     // ---- ÉTAT VIDE ----
-    // Affiché quand l'utilisateur n'a aucun favori
     if (favoris.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.fillMaxSize().statusBarsPadding(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Aucun favori", style = MaterialTheme.typography.titleMedium)
                 Text(
@@ -73,22 +78,18 @@ fun FavoritesScreen(favorisViewModel: FavorisViewModel) {
         }
     } else {
         // ---- GRILLE DES FAVORIS ----
-        // Identique à la grille d'AnimeScreen (2 colonnes, espacement 12dp)
-        // mais avec FavoriteCard au lieu d'AnimeCard
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().statusBarsPadding()
         ) {
-            // key = { it.malId } : identifiant unique de chaque item pour optimiser
-            // les recompositions lors des suppressions (animation de retrait correcte)
             items(favoris, key = { it.malId }) { fav ->
                 FavoriteCard(
                     fav = fav,
-                    // Lambda de suppression : passe le FavorisEntity au ViewModel
-                    onDelete = { favorisViewModel.supprimerFavoris(fav) }
+                    onDelete = { favorisViewModel.supprimerFavoris(fav) },
+                    onClick = { homeViewModel.loadFavoriteDetail(fav.malId) }
                 )
             }
         }
@@ -116,9 +117,11 @@ fun FavoritesScreen(favorisViewModel: FavorisViewModel) {
  * @param onDelete Callback déclenché au clic sur 🗑️ → appelle FavorisViewModel.supprimerFavoris()
  */
 @Composable
-fun FavoriteCard(fav: FavorisEntity, onDelete: () -> Unit) {
+fun FavoriteCard(fav: FavorisEntity, onDelete: () -> Unit, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp),
         shape = MaterialTheme.shapes.medium
     ) {

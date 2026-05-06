@@ -196,4 +196,28 @@ class HomeViewModel : ViewModel() {
         _isSearching.value = false
         searchJob?.cancel()
     }
+
+    // -------------------------------------------------------------------------
+    // DÉTAIL FAVORI — Chargement depuis l'API au clic sur une carte favori
+    // -------------------------------------------------------------------------
+
+    private val _favoriteDetailAnime = MutableStateFlow<AnimeData?>(null)
+    val favoriteDetailAnime: StateFlow<AnimeData?> = _favoriteDetailAnime
+
+    private val _isFavoriteDetailLoading = MutableStateFlow(false)
+    val isFavoriteDetailLoading: StateFlow<Boolean> = _isFavoriteDetailLoading
+
+    fun loadFavoriteDetail(id: Int) {
+        viewModelScope.launch {
+            _isFavoriteDetailLoading.value = true
+            repository.getAnimeDetail(id)
+                .onSuccess { _favoriteDetailAnime.value = it }
+                .onFailure { /* silencieux — l'utilisateur peut réessayer */ }
+            _isFavoriteDetailLoading.value = false
+        }
+    }
+
+    fun clearFavoriteDetail() {
+        _favoriteDetailAnime.value = null
+    }
 }
